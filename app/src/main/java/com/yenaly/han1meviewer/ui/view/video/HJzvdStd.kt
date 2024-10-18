@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnLongClickListener
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.ProgressBar
@@ -444,11 +445,11 @@ class HJzvdStd @JvmOverloads constructor(
     override fun clickBack() {
         Log.i(TAG, "backPress")
         when {
-            CONTAINER_LIST.size != 0 && CURRENT_JZVD != null -> { //判断条件，因为当前所有goBack都是回到普通窗口
+            CONTAINER_LIST.isNotEmpty() && CURRENT_JZVD != null -> { //判断条件，因为当前所有goBack都是回到普通窗口
                 CURRENT_JZVD.gotoNormalScreen()
             }
 
-            CONTAINER_LIST.size == 0 && CURRENT_JZVD != null && CURRENT_JZVD.screen != SCREEN_NORMAL -> { //退出直接进入的全屏
+            CONTAINER_LIST.isEmpty() && CURRENT_JZVD != null && CURRENT_JZVD.screen != SCREEN_NORMAL -> { //退出直接进入的全屏
                 CURRENT_JZVD.clearFloatScreen()
             }
 
@@ -590,6 +591,23 @@ class HJzvdStd @JvmOverloads constructor(
         }
     }
 
+    override fun gotoNormalScreen() {
+        gobakFullscreenTime = System.currentTimeMillis()
+        val vg = JZUtils.scanForActivity(context).window.decorView as ViewGroup
+        vg.removeView(this)
+        // #issue-crashlytics-1b3cebd1278de6fc52230eb5517be879:
+        // 你永远要给不更新的 JZVD 擦屁股才能保持稳定
+        CONTAINER_LIST.peekLast()?.apply {
+            removeViewAt(blockIndex)
+            addView(this@HJzvdStd, blockIndex, blockLayoutParams)
+        }
+        CONTAINER_LIST.poll()
+        setScreenNormal()
+        JZUtils.showStatusBar(jzvdContext)
+        JZUtils.setRequestedOrientation(jzvdContext, NORMAL_ORIENTATION)
+        JZUtils.showSystemUI(jzvdContext)
+    }
+
     override fun onStatePreparingChangeUrl() {
         Log.i(TAG, "onStatePreparingChangeUrl " + " [" + this.hashCode() + "] ")
         state = STATE_PREPARING_CHANGE_URL
@@ -729,7 +747,7 @@ class HJzvdStd @JvmOverloads constructor(
         val adapter = hKeyframeAdapter
         rv.adapter = adapter
         adapter.setStateViewLayout(
-            View.inflate(v.context, R.layout.layout_empty_view, null),
+            inflate(v.context, R.layout.layout_empty_view, null),
             this@HJzvdStd.context.getString(R.string.here_is_empty) + "\n"
                     + this@HJzvdStd.context.getString(R.string.long_press_to_add_h_keyframe)
         )

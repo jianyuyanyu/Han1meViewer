@@ -36,9 +36,9 @@ import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.yenaly.han1meviewer.DATE_CODE
 import com.yenaly.han1meviewer.PREVIEW_COMMENT_PREFIX
 import com.yenaly.han1meviewer.R
-import com.yenaly.han1meviewer.cialloMessage
 import com.yenaly.han1meviewer.databinding.ActivityPreviewBinding
 import com.yenaly.han1meviewer.logic.state.WebsiteState
+import com.yenaly.han1meviewer.pienization
 import com.yenaly.han1meviewer.ui.adapter.HanimePreviewNewsRvAdapter
 import com.yenaly.han1meviewer.ui.adapter.HanimePreviewTourRvAdapter
 import com.yenaly.han1meviewer.ui.view.CenterLinearLayoutManager
@@ -77,7 +77,7 @@ import kotlinx.datetime.toLocalDateTime
 class PreviewActivity : YenalyActivity<ActivityPreviewBinding>() {
 
     companion object {
-        private const val animDuration = 300L
+        private const val ANIM_DURATION = 300L
         private val animInterpolator = FastOutSlowInInterpolator()
     }
 
@@ -236,7 +236,7 @@ class PreviewActivity : YenalyActivity<ActivityPreviewBinding>() {
                     when (state) {
                         is WebsiteState.Error -> {
                             //binding.srlPreview.finishRefresh()
-                            supportActionBar?.title = state.throwable.cialloMessage
+                            supportActionBar?.title = state.throwable.pienization
                         }
 
                         is WebsiteState.Loading -> {
@@ -358,7 +358,7 @@ class PreviewActivity : YenalyActivity<ActivityPreviewBinding>() {
             fromColor = (binding.collapsingToolbar.contentScrim as ColorDrawable).color,
             toColor = ColorUtils.blendARGB(darkMuted, Color.BLACK, 0.3f)
         ) {
-            duration = animDuration
+            duration = ANIM_DURATION
             interpolator = animInterpolator
             addUpdateListener(lifecycle) {
                 val value = it.animatedValue as Int
@@ -369,7 +369,7 @@ class PreviewActivity : YenalyActivity<ActivityPreviewBinding>() {
             fromColor = (binding.llTour.background as? ColorDrawable)?.color ?: Color.TRANSPARENT,
             toColor = darkMuted
         ) {
-            duration = animDuration
+            duration = ANIM_DURATION
             interpolator = animInterpolator
             addUpdateListener(lifecycle) {
                 val value = it.animatedValue as Int
@@ -398,16 +398,16 @@ class PreviewActivity : YenalyActivity<ActivityPreviewBinding>() {
             override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
                 when (state) {
                     State.EXPANDED -> {
-                        binding.fabPrevious.animate().translationX(0F).setDuration(animDuration)
+                        binding.fabPrevious.animate().translationX(0F).setDuration(ANIM_DURATION)
                             .setInterpolator(animInterpolator).start()
-                        binding.fabNext.animate().translationX(0F).setDuration(animDuration)
+                        binding.fabNext.animate().translationX(0F).setDuration(ANIM_DURATION)
                             .setInterpolator(animInterpolator).start()
                     }
 
                     State.INTERMEDIATE -> {
-                        binding.fabPrevious.animate().translationX(-500F).setDuration(animDuration)
+                        binding.fabPrevious.animate().translationX(-500F).setDuration(ANIM_DURATION)
                             .setInterpolator(animInterpolator).start()
-                        binding.fabNext.animate().translationX(500F).setDuration(animDuration)
+                        binding.fabNext.animate().translationX(500F).setDuration(ANIM_DURATION)
                             .setInterpolator(animInterpolator).start()
                     }
 
